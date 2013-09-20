@@ -62,8 +62,9 @@ public class MultitaskSuRequestActivity extends FragmentActivity {
     Spinner mSpinner;
     
     Handler mHandler = new Handler();
-    
-    int mTimeLeft = 3;
+
+//This is the values for timeout on popup    
+    int mTimeLeft = 0;
     
     Button mAllow;
     Button mDeny;
