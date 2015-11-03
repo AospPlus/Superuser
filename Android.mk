@@ -10,12 +10,21 @@ LOCAL_MODULE := su
 LOCAL_MODULE_TAGS := eng debug optional
 LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_STATIC_LIBRARIES := libc libcutils libselinux
+
+ifeq ($(TARGET_PRODUCT),)
+LOCAL_C_INCLUDES := jni/libselinux/include/ jni/libsepol/include/ jni/sqlite3/
+LOCAL_SRC_FILES := su/su.c su/daemon.c su/activity.c su/db.c su/utils.c su/pts.c sqlite3/sqlite3.c
+
+LOCAL_CFLAGS := -DSQLITE_OMIT_LOAD_EXTENSION
+LOCAL_CFLAGS += -DREQUESTOR=\"$(shell cat packageName)\"
+else
 LOCAL_C_INCLUDES := external/sqlite/dist
 LOCAL_SRC_FILES := Superuser/jni/su/su.c Superuser/jni/su/daemon.c Superuser/jni/su/activity.c Superuser/jni/su/db.c Superuser/jni/su/utils.c Superuser/jni/su/pts.c Superuser/jni/sqlite3/sqlite3.c
 LOCAL_CFLAGS := -DSQLITE_OMIT_LOAD_EXTENSION -DREQUESTOR=\"$(SUPERUSER_PACKAGE)\"
 
 ifdef SUPERUSER_PACKAGE_PREFIX
   LOCAL_CFLAGS += -DREQUESTOR_PREFIX=\"$(SUPERUSER_PACKAGE_PREFIX)\"
+endif
 endif
 
 ifdef SUPERUSER_EMBEDDED
@@ -38,4 +47,9 @@ $(SUPERUSER_MARKER): $(LOCAL_INSTALLED_MODULE)
 ALL_MODULES.$(LOCAL_MODULE).INSTALLED := \
     $(ALL_MODULES.$(LOCAL_MODULE).INSTALLED) $(SUPERUSER_RC) $(SUPERUSER_MARKER)
 
+endif
+
+ifeq ($(TARGET_PRODUCT),)
+include $(my_path)/libselinux/Android.mk
+include $(my_path)/libsepol/Android.mk
 endif
